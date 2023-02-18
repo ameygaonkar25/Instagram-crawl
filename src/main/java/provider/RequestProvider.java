@@ -4,6 +4,7 @@ import config.AccountCreds;
 import org.json.simple.parser.ParseException;
 import org.openqa.selenium.*;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,11 +47,11 @@ public class RequestProvider {
 
     //#Go to followers list
     public void goToFollowersList(){
-        driver.findElement(By.xpath("//div[text()=' following']")).click();
+        driver.findElement(By.xpath("//div[text()=' followers']")).click();
     }
 
     //#Scroll till list is there
-    public void scrollTillListEnd() throws InterruptedException {
+    public void scrollTillListEnd() throws InterruptedException, IOException {
         JavascriptExecutor js = (JavascriptExecutor) driver;
 
         //turnaround code for scrolling
@@ -65,9 +66,9 @@ public class RequestProvider {
             i++;
         }
 
-        WebElement followersDiv = driver.findElement(By.xpath("/html/body/div[2]/div/div/div/div[2]/div/div/div[1]/div/div[2]/div/div/div/div/div[2]/div/div/div[3]/div[1]/div"));
+        WebElement followersDiv = driver.findElement(By.xpath("//div[@class='_aano']/div/div[1]"));
         List<WebElement> followers = followersDiv.findElements(By.tagName("a"));
-        int followersCount = followers.size()/2;
+        int followersCount = followersDiv.findElements(By.xpath("//div[@class='_aano']/div[1]/div[1]/div")).size();
         System.out.println(followersCount);
 
         //creating list to store usernames only
@@ -75,10 +76,17 @@ public class RequestProvider {
 
         //Storing usernames of the followers into list
         for(WebElement followList : followers) {
-            String strLinkTest = followList.getText();;
+            String strLinkTest = followList.getText();
             followersList.add(strLinkTest.split("\n")[0]);
         }
         System.out.println(Arrays.toString(followersList.toArray()));
+
+        FileWriter writer = null;
+        writer = new FileWriter("src/main/resources/outputUN.txt");
+        for(String str: followersList) {
+            writer.write(str + ",");
+        }
+        writer.close();
 
     }
 
